@@ -17,6 +17,7 @@ class CodeDefinition:
 
     code: str
     type: CodeTypes
+    display_name: str = ""
     repeat: int = 1
     wait: bool = True
 
@@ -49,6 +50,7 @@ class CodeDefinition:
 # "Live TV": "LIVETV",
 
 AVAILABLE_COMMANDS: dict[str, CodeDefinition] = {
+    "guide": CodeDefinition(code="Guide", display_name="Guide", type=CodeTypes.IRCODE),
     ucapi.media_player.Commands.CHANNEL_DOWN: CodeDefinition(
         code="ChannelDown", type=CodeTypes.IRCODE
     ),

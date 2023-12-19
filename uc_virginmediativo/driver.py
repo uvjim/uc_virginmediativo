@@ -7,29 +7,44 @@ import os
 from typing import Any
 import ucapi
 
+import button
 import config
+import const
 import media_player
 from pyvmtivo.client import Client
 from setup_flow import SetupFlow
 
 _LOG = logging.getLogger("driver")
 _LOOP = asyncio.new_event_loop()
-_configured_tivos: dict[str, media_player.TivoMediaPlayer] = {}
+_configured_tivos: dict[
+    str, list[button.TivoButton | media_player.TivoMediaPlayer]
+] = {}
 
 api = ucapi.IntegrationAPI(_LOOP)
 
 
 def _add_configured_device(device: config.VmTivoDevice) -> None:
     """Ensure the device is available."""
-    media_entity: media_player.TivoMediaPlayer = media_player.TivoMediaPlayer(
-        device, Client(host=device.address, port=device.port, command_timeout=0.75)
+
+    _client: Client = Client(
+        host=device.address, port=device.port, command_timeout=0.75
     )
+    _make_available: list[button.TivoButton | media_player.TivoMediaPlayer] = []
 
-    _configured_tivos[device.id] = media_entity
+    _make_available.append(media_player.TivoMediaPlayer(device, _client))
 
-    if api.available_entities.contains(media_entity.ucapi_mediaplayer.id):
-        api.available_entities.remove(media_entity.ucapi_mediaplayer.id)
-    api.available_entities.add(media_entity.ucapi_mediaplayer)
+    for btn in const.AVAILABLE_COMMANDS.keys():
+        if not isinstance(btn, ucapi.media_player.Commands):
+            _make_available.append(
+                button.TivoButton(const.AVAILABLE_COMMANDS.get(btn), device, _client)
+            )
+
+    _configured_tivos[device.id] = _make_available
+
+    for entity in _configured_tivos[device.id]:
+        if api.available_entities.contains(entity.ucapi_entity.id):
+            api.available_entities.remove(entity.ucapi_entity.id)
+        api.available_entities.add(entity.ucapi_entity)
 
 
 def on_device_added(device: config.VmTivoDevice) -> None:

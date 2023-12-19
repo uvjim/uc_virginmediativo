@@ -21,7 +21,7 @@ class TivoMediaPlayer:
         self._client: Client = client
         self._state: ucapi.media_player.States = ucapi.media_player.States.UNKNOWN
 
-        self._media_player: ucapi.MediaPlayer = ucapi.MediaPlayer(
+        self._ucapi_entity: ucapi.MediaPlayer = ucapi.MediaPlayer(
             device.id,
             device.name,
             [
@@ -83,6 +83,6 @@ class TivoMediaPlayer:
         return ucapi.StatusCodes.OK
 
     @property
-    def ucapi_mediaplayer(self) -> ucapi.MediaPlayer:
+    def ucapi_entity(self) -> ucapi.MediaPlayer:
         """Return the ucapi media player"""
-        return self._media_player
+        return self._ucapi_entity
