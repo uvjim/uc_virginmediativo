@@ -34,12 +34,6 @@ def _add_configured_device(device: config.VmTivoDevice) -> None:
     api.available_entities.add(media_entity.ucapi_mediaplayer)
 
 
-@api.listens_to(ucapi.Events.CONNECT)
-async def async_on_connect():
-    """Process remote connection."""
-    _LOG.debug("remote connected")
-
-
 def on_device_added(device: config.VmTivoDevice) -> None:
     """Process new device in the configuration."""
     _LOG.debug("new device: %s", device)
@@ -57,6 +51,24 @@ def on_device_removed(device: config.VmTivoDevice | None) -> None:
         if device.id in _configured_tivos:
             api.configured_entities.remove(device.id)
             api.available_entities.remove(device.id)
+
+
+@api.listens_to(ucapi.Events.CONNECT)
+async def async_on_connect():
+    """Process remote connection."""
+    _LOG.debug("remote connected")
+
+
+@api.listens_to(ucapi.Events.SUBSCRIBE_ENTITIES)
+async def async_on_subscribe_entities(entity_ids) -> None:
+    """"""
+    _LOG.debug("subscribe entities event, %s", entity_ids)
+
+
+@api.listens_to(ucapi.Events.UNSUBSCRIBE_ENTITIES)
+async def async_on_unsubscribe_entities(entity_ids) -> None:
+    """"""
+    _LOG.debug("unsubscribe entities event, %s", entity_ids)
 
 
 async def async_main():
