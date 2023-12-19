@@ -14,20 +14,18 @@ from setup_flow import SetupFlow
 
 _LOG = logging.getLogger("driver")
 _LOOP = asyncio.new_event_loop()
-_configured_tivos: dict[str, config.VmTivoDevice] = {}
+_configured_tivos: dict[str, media_player.TivoMediaPlayer] = {}
 
 api = ucapi.IntegrationAPI(_LOOP)
 
 
 def _add_configured_device(device: config.VmTivoDevice) -> None:
     """Ensure the device is available."""
-    _configured_tivos[device.id] = Client(
-        host=device.address, port=device.port, command_timeout=0.75
+    media_entity: media_player.TivoMediaPlayer = media_player.TivoMediaPlayer(
+        device, Client(host=device.address, port=device.port, command_timeout=0.75)
     )
 
-    media_entity: media_player.TivoMediaPlayer = media_player.TivoMediaPlayer(
-        device, _configured_tivos[device.id]
-    )
+    _configured_tivos[device.id] = media_entity
 
     if api.available_entities.contains(media_entity.ucapi_mediaplayer.id):
         api.available_entities.remove(media_entity.ucapi_mediaplayer.id)
