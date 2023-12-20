@@ -25,23 +25,7 @@ class CodeDefinition:
 # IRCODES not mapped
 # "Clear": "Clear"
 # "Exit": "Exit"
-# "Guide": "Guide",
-# "Info": "Info",
-# "NUM0": "NUM0",
-# "NUM1": "NUM1",
-# "NUM2": "NUM2",
-# "NUM3": "NUM3",
-# "NUM4": "NUM4",
-# "NUM5": "NUM5",
-# "NUM6": "NUM6",
-# "NUM7": "NUM7",
-# "NUM8": "NUM8",
-# "NUM9": "NUM9",
-# "OK": "Select",
 # "Play": "Play",
-# "Record": "Record",
-# "Thumbs Down": "ThumbsDown",
-# "Thumbs Up": "ThumpsUp",
 # "TV": "LiveTV",
 # "Standby": "Standby",
 
@@ -51,6 +35,26 @@ class CodeDefinition:
 
 AVAILABLE_COMMANDS: dict[str, CodeDefinition] = {
     "guide": CodeDefinition(code="Guide", display_name="Guide", type=CodeTypes.IRCODE),
+    "info": CodeDefinition(code="info", display_name="Info", type=CodeTypes.IRCODE),
+    "num0": CodeDefinition(code="num0", display_name="0", type=CodeTypes.IRCODE),
+    "num1": CodeDefinition(code="num1", display_name="1", type=CodeTypes.IRCODE),
+    "num2": CodeDefinition(code="num2", display_name="2", type=CodeTypes.IRCODE),
+    "num3": CodeDefinition(code="num3", display_name="3", type=CodeTypes.IRCODE),
+    "num4": CodeDefinition(code="num4", display_name="4", type=CodeTypes.IRCODE),
+    "num5": CodeDefinition(code="num5", display_name="5", type=CodeTypes.IRCODE),
+    "num6": CodeDefinition(code="num6", display_name="6", type=CodeTypes.IRCODE),
+    "num7": CodeDefinition(code="num7", display_name="7", type=CodeTypes.IRCODE),
+    "num8": CodeDefinition(code="num8", display_name="8", type=CodeTypes.IRCODE),
+    "num9": CodeDefinition(code="num9", display_name="9", type=CodeTypes.IRCODE),
+    "record": CodeDefinition(
+        code="record", display_name="Record", type=CodeTypes.IRCODE
+    ),
+    "thumpsdown": CodeDefinition(
+        code="thumbsdown", display_name="Thumbs Down", type=CodeTypes.IRCODE
+    ),
+    "thumpsup": CodeDefinition(
+        code="thumbsup", display_name="Thumbs Up", type=CodeTypes.IRCODE
+    ),
     ucapi.media_player.Commands.CHANNEL_DOWN: CodeDefinition(
         code="ChannelDown", type=CodeTypes.IRCODE
     ),
