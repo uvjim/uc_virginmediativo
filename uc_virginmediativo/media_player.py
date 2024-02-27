@@ -1,15 +1,22 @@
 """"""
 
 import ucapi
-
+import asyncio
 import logging
 from typing import Any
-
+from pyee import AsyncIOEventEmitter
 from config import VmTivoDevice
 from pyvmtivo.client import Client
 import const
+from enum import StrEnum
 
 _LOG = logging.getLogger(__name__)
+
+
+class Events(StrEnum):
+    """Available events."""
+
+    STATE_CHANGED = "uvjim_state_changed"
 
 
 class TivoMediaPlayer:
@@ -19,7 +26,9 @@ class TivoMediaPlayer:
         """Initialise."""
 
         self._client: Client = client
-        self._state: ucapi.media_player.States = ucapi.media_player.States.UNKNOWN
+        self._events: AsyncIOEventEmitter = AsyncIOEventEmitter(
+            asyncio.get_running_loop()
+        )
 
         self._ucapi_entity: ucapi.MediaPlayer = ucapi.MediaPlayer(
             device.id,
@@ -38,14 +47,21 @@ class TivoMediaPlayer:
                 ucapi.media_player.Features.STOP,
             ],
             {
-                ucapi.media_player.Attributes.STATE: self._state,
+                ucapi.media_player.Attributes.STATE: (
+                    ucapi.media_player.States.ON
+                    if self._client.device.channel_number
+                    else ucapi.media_player.States.UNKNOWN
+                ),
             },
             ucapi.media_player.DeviceClasses.SET_TOP_BOX,
             cmd_handler=self.async_cmd_handler,
         )
 
     async def async_cmd_handler(
-        self, entity: ucapi.MediaPlayer, cmd_id: str, params: dict[str, Any] | None
+        self,
+        entity: ucapi.MediaPlayer,
+        cmd_id: ucapi.media_player.Commands,
+        params: dict[str, Any] | None,
     ) -> ucapi.StatusCodes:
         """Process commands."""
         _LOG.debug("media player cmd_handler %s", cmd_id)
@@ -70,6 +86,26 @@ class TivoMediaPlayer:
                     if code_def.type == const.CodeTypes.TELEPORT:
                         for _ in range(1, code_def.repeat + 1):
                             await self._client.send_teleport(code_def.code)
+
+                    # region #-- update state of the media player --#
+                    _state: ucapi.media_player.States | None = code_def.state
+                    if cmd_id == ucapi.media_player.Commands.PLAY_PAUSE:
+                        if (
+                            self.ucapi_entity.attributes.get(
+                                ucapi.media_player.Attributes.STATE
+                            )
+                            == ucapi.media_player.States.PAUSED
+                        ):
+                            _state = ucapi.media_player.States.PLAYING
+                        else:
+                            _state = ucapi.media_player.States.PAUSED
+                    if _state is not None:
+                        self._events.emit(
+                            Events.STATE_CHANGED,
+                            self.ucapi_entity.id,
+                            {ucapi.media_player.Attributes.STATE: _state},
+                        )
+                    # endregion
                 else:
                     return ucapi.StatusCodes.NOT_IMPLEMENTED
         except Exception as exc:
@@ -81,6 +117,12 @@ class TivoMediaPlayer:
             return ucapi.StatusCodes.SERVER_ERROR
 
         return ucapi.StatusCodes.OK
+
+    @property
+    def events(self) -> AsyncIOEventEmitter:
+        """Return the event emitter."""
+
+        return self._events
 
     @property
     def ucapi_entity(self) -> ucapi.MediaPlayer:

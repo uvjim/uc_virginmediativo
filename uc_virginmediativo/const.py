@@ -1,4 +1,5 @@
 """"""
+
 from dataclasses import dataclass
 from enum import StrEnum
 import ucapi
@@ -19,6 +20,7 @@ class CodeDefinition:
     type: CodeTypes
     display_name: str = ""
     repeat: int = 1
+    state: ucapi.media_player.States | None = None
     wait: bool = True
 
 
@@ -98,10 +100,17 @@ AVAILABLE_COMMANDS: dict[str, CodeDefinition] = {
         code="NOWPLAYING", type=CodeTypes.TELEPORT
     ),
     ucapi.media_player.Commands.OFF: CodeDefinition(
-        code="Standby", type=CodeTypes.IRCODE, repeat=2, wait=False
+        code="Standby",
+        state=ucapi.media_player.States.OFF,
+        type=CodeTypes.IRCODE,
+        repeat=2,
+        wait=False,
     ),
     ucapi.media_player.Commands.ON: CodeDefinition(
-        code="Standby", type=CodeTypes.IRCODE, wait=False
+        code="Standby",
+        state=ucapi.media_player.States.ON,
+        type=CodeTypes.IRCODE,
+        wait=False,
     ),
     ucapi.media_player.Commands.PLAY_PAUSE: CodeDefinition(
         code="Pause", type=CodeTypes.IRCODE
@@ -113,6 +122,6 @@ AVAILABLE_COMMANDS: dict[str, CodeDefinition] = {
         code="Reverse", type=CodeTypes.IRCODE
     ),
     ucapi.media_player.Commands.STOP: CodeDefinition(
-        code="Stop", type=CodeTypes.IRCODE
+        code="Stop", state=ucapi.media_player.States.PLAYING, type=CodeTypes.IRCODE
     ),
 }
