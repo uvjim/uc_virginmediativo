@@ -112,15 +112,6 @@ class SetupFlow:
         _LOG.debug("step discovery: %s", msg)
         self._discovered_devices = await discover.devices()
 
-        self._discovered_devices.append(
-            {
-                "address": "192.168.1.238",
-                "name": "Lounge2",
-                "port": 31339,
-                "serial": "C68000022CD7571",
-            }
-        )
-
         if len(self._discovered_devices) == 0:
             return await self.async_step_no_devices(msg)
         if len(self._discovered_devices) == 1:
