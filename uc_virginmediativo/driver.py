@@ -25,8 +25,7 @@ api = ucapi.IntegrationAPI(_LOOP)
 
 def _add_configured_device(device: config.VmTivoDevice) -> None:
     """Ensure the device is available."""
-
-    _LOG.debug("adding configured devices")
+    _LOG.debug("_add_configured_device: entered (%s)", device)
     _client: Client = Client(
         host=device.address, port=device.port, command_timeout=0.75
     )
@@ -51,15 +50,19 @@ def _add_configured_device(device: config.VmTivoDevice) -> None:
             api.available_entities.remove(entity.ucapi_entity.id)
         api.available_entities.add(entity.ucapi_entity)
 
+    _LOG.debug("_add_configured_device: exited (%s)", device)
+
 
 def on_device_added(device: config.VmTivoDevice) -> None:
     """Process new device in the configuration."""
-    _LOG.debug("new device: %s", device)
+    _LOG.debug("on_device_added: entered (%s)", device)
     _add_configured_device(device)
+    _LOG.debug("on_device_added: exited (%s)", device)
 
 
 def on_device_removed(device: config.VmTivoDevice | None) -> None:
     """Process a removed device."""
+    _LOG.debug("on_device_removed: entered")
     if device is None:
         _LOG.debug("all devices removed")
         api.configured_entities.clear()
@@ -69,33 +72,57 @@ def on_device_removed(device: config.VmTivoDevice | None) -> None:
         if device.id in _configured_tivos:
             api.configured_entities.remove(device.id)
             api.available_entities.remove(device.id)
+    _LOG.debug("on_device_removed: exited")
 
 
 @api.listens_to(ucapi.Events.CONNECT)
 async def async_on_connect():
     """Process remote connection."""
-    _LOG.debug("remote connected")
+    _LOG.debug("async_on_connect: entered")
+    for dev_id in _configured_tivos.keys():
+        for tivo in _configured_tivos[dev_id]:
+            if isinstance(tivo, media_player.TivoMediaPlayer):
+                await tivo.async_query_state()
+
+    _LOG.debug("async_on_connect: exited")
+
+
+@api.listens_to(ucapi.Events.DISCONNECT)
+async def async_on_disconnect():
+    """Process remote disconnect."""
+    _LOG.debug("async_on_disconnect: entered")
+    _LOG.debug("async_on_disconnect: exited")
 
 
 async def async_on_media_player_attributes_changed(
     entity_id: str, attributes: dict[str, Any]
 ):
     """Update the attributes for the media_player entity if they change."""
-
-    _LOG.debug("%s: updating attributes %s", entity_id, attributes)
+    _LOG.debug(
+        "async_on_media_player_attributes_changed: entered (%s: %s)",
+        entity_id,
+        attributes,
+    )
     api.configured_entities.update_attributes(entity_id, attributes)
+    _LOG.debug(
+        "async_on_media_player_attributes_changed: exited (%s: %s)",
+        entity_id,
+        attributes,
+    )
 
 
 @api.listens_to(ucapi.Events.SUBSCRIBE_ENTITIES)
 async def async_on_subscribe_entities(entity_ids: list[str]) -> None:
     """"""
-    _LOG.debug("subscribe entities event, %s", entity_ids)
+    _LOG.debug("async_on_subscribe_entities: entered (%s)", entity_ids)
+    _LOG.debug("async_on_subscribe_entities: exited (%s)", entity_ids)
 
 
 @api.listens_to(ucapi.Events.UNSUBSCRIBE_ENTITIES)
 async def async_on_unsubscribe_entities(entity_ids: list[str]) -> None:
     """"""
-    _LOG.debug("unsubscribe entities event, %s", entity_ids)
+    _LOG.debug("async_on_unsubscribe_entities: entered (%s)", entity_ids)
+    _LOG.debug("async_on_unsubscribe_entities: exited (%s)", entity_ids)
 
 
 async def async_main():

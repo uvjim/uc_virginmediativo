@@ -7,6 +7,7 @@ from typing import Any
 from pyee import AsyncIOEventEmitter
 from config import VmTivoDevice
 from pyvmtivo.client import Client
+from pyvmtivo.exceptions import VirginMediaError
 import const
 from enum import StrEnum
 
@@ -64,7 +65,7 @@ class TivoMediaPlayer:
         params: dict[str, Any] | None,
     ) -> ucapi.StatusCodes:
         """Process commands."""
-        _LOG.debug("media player cmd_handler %s", cmd_id)
+        _LOG.debug("async_cmd_handler: entered (%s)", cmd_id)
 
         err: bool = False
 
@@ -109,14 +110,35 @@ class TivoMediaPlayer:
                 else:
                     return ucapi.StatusCodes.NOT_IMPLEMENTED
         except Exception as exc:
-            _LOG.error("%s", exc)
+            _LOG.error("async_cmd_handler: %s", exc)
             err = True
         # endregion
 
         if err:
             return ucapi.StatusCodes.SERVER_ERROR
 
+        _LOG.debug("async_cmd_handler: exited (%s)", cmd_id)
         return ucapi.StatusCodes.OK
+
+    async def async_query_state(self) -> None:
+        """Query for current state."""
+        _LOG.debug("async_query_state: entered (%s)", self._client.device.host)
+        try:
+            async with self._client:
+                await self._client.wait_for_data()
+            if self._client.device.channel_number is not None:
+                self._events.emit(
+                    Events.STATE_CHANGED,
+                    self.ucapi_entity.id,
+                    {
+                        ucapi.media_player.Attributes.STATE: ucapi.media_player.States.PLAYING
+                    },
+                )
+
+        except VirginMediaError as exc:
+            _LOG.error("async_query_state: %s", exc)
+
+        _LOG.debug("async_query_state: exited (%s)", self._client.device.host)
 
     @property
     def events(self) -> AsyncIOEventEmitter:
