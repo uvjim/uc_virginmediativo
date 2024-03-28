@@ -22,40 +22,36 @@ class CodeDefinition:
     repeat: int = 1
     state: ucapi.media_player.States | None = None
     wait: bool = True
+    wait_repeat: float | None = None
 
 
 # IRCODES not mapped
-# "Clear": "Clear"
-# "Exit": "Exit"
 # "Play": "Play",
-# "TV": "LiveTV",
 # "Standby": "Standby",
+# "TV": "tv",
 
 # TELEPORTS not mapped
 # "Guide": "GUIDE",
 # "Live TV": "LIVETV",
 
 AVAILABLE_COMMANDS: dict[str, CodeDefinition] = {
-    "guide": CodeDefinition(code="Guide", display_name="Guide", type=CodeTypes.IRCODE),
-    "info": CodeDefinition(code="info", display_name="Info", type=CodeTypes.IRCODE),
-    "num0": CodeDefinition(code="num0", display_name="0", type=CodeTypes.IRCODE),
-    "num1": CodeDefinition(code="num1", display_name="1", type=CodeTypes.IRCODE),
-    "num2": CodeDefinition(code="num2", display_name="2", type=CodeTypes.IRCODE),
-    "num3": CodeDefinition(code="num3", display_name="3", type=CodeTypes.IRCODE),
-    "num4": CodeDefinition(code="num4", display_name="4", type=CodeTypes.IRCODE),
-    "num5": CodeDefinition(code="num5", display_name="5", type=CodeTypes.IRCODE),
-    "num6": CodeDefinition(code="num6", display_name="6", type=CodeTypes.IRCODE),
-    "num7": CodeDefinition(code="num7", display_name="7", type=CodeTypes.IRCODE),
-    "num8": CodeDefinition(code="num8", display_name="8", type=CodeTypes.IRCODE),
-    "num9": CodeDefinition(code="num9", display_name="9", type=CodeTypes.IRCODE),
-    "record": CodeDefinition(
-        code="record", display_name="Record", type=CodeTypes.IRCODE
+    "CLEAR": CodeDefinition(
+        code="clear",
+        type=CodeTypes.IRCODE,
+        wait=False,
     ),
-    "thumpsdown": CodeDefinition(
-        code="thumbsdown", display_name="Thumbs Down", type=CodeTypes.IRCODE
+    "THUMBSDOWN": CodeDefinition(
+        code="thumbsdown",
+        type=CodeTypes.IRCODE,
+        wait=False,
     ),
-    "thumpsup": CodeDefinition(
-        code="thumbsup", display_name="Thumbs Up", type=CodeTypes.IRCODE
+    "THUMBSUP": CodeDefinition(
+        code="thumbsup",
+        type=CodeTypes.IRCODE,
+        wait=False,
+    ),
+    ucapi.media_player.Commands.BACK: CodeDefinition(
+        code="Exit", type=CodeTypes.IRCODE
     ),
     ucapi.media_player.Commands.CHANNEL_DOWN: CodeDefinition(
         code="ChannelDown", type=CodeTypes.IRCODE
@@ -64,40 +60,107 @@ AVAILABLE_COMMANDS: dict[str, CodeDefinition] = {
         code="ChannelUp", type=CodeTypes.IRCODE
     ),
     ucapi.media_player.Commands.CURSOR_DOWN: CodeDefinition(
-        code="Down", type=CodeTypes.IRCODE
+        code="Down",
+        type=CodeTypes.IRCODE,
+        wait=False,
     ),
     ucapi.media_player.Commands.CURSOR_ENTER: CodeDefinition(
         code="Select", type=CodeTypes.IRCODE
     ),
     ucapi.media_player.Commands.CURSOR_LEFT: CodeDefinition(
-        code="Left", type=CodeTypes.IRCODE
+        code="Left",
+        type=CodeTypes.IRCODE,
+        wait=False,
     ),
     ucapi.media_player.Commands.CURSOR_RIGHT: CodeDefinition(
-        code="Right", type=CodeTypes.IRCODE
+        code="Right",
+        type=CodeTypes.IRCODE,
+        wait=False,
     ),
     ucapi.media_player.Commands.CURSOR_UP: CodeDefinition(
-        code="Up", type=CodeTypes.IRCODE
+        code="Up",
+        type=CodeTypes.IRCODE,
+        wait=False,
+    ),
+    ucapi.media_player.Commands.DIGIT_0: CodeDefinition(
+        code="num0", type=CodeTypes.IRCODE
+    ),
+    ucapi.media_player.Commands.DIGIT_1: CodeDefinition(
+        code="num1", type=CodeTypes.IRCODE
+    ),
+    ucapi.media_player.Commands.DIGIT_2: CodeDefinition(
+        code="num2", type=CodeTypes.IRCODE
+    ),
+    ucapi.media_player.Commands.DIGIT_3: CodeDefinition(
+        code="num3", type=CodeTypes.IRCODE
+    ),
+    ucapi.media_player.Commands.DIGIT_4: CodeDefinition(
+        code="num4", type=CodeTypes.IRCODE
+    ),
+    ucapi.media_player.Commands.DIGIT_5: CodeDefinition(
+        code="num5", type=CodeTypes.IRCODE
+    ),
+    ucapi.media_player.Commands.DIGIT_6: CodeDefinition(
+        code="num6", type=CodeTypes.IRCODE
+    ),
+    ucapi.media_player.Commands.DIGIT_7: CodeDefinition(
+        code="num7", type=CodeTypes.IRCODE
+    ),
+    ucapi.media_player.Commands.DIGIT_8: CodeDefinition(
+        code="num8", type=CodeTypes.IRCODE
+    ),
+    ucapi.media_player.Commands.DIGIT_9: CodeDefinition(
+        code="num9", type=CodeTypes.IRCODE
     ),
     ucapi.media_player.Commands.FAST_FORWARD: CodeDefinition(
-        code="Forward", type=CodeTypes.IRCODE
+        code="Forward",
+        type=CodeTypes.IRCODE,
+        wait=False,
     ),
     ucapi.media_player.Commands.FUNCTION_BLUE: CodeDefinition(
-        code="Action_D", type=CodeTypes.IRCODE
+        code="Action_D",
+        type=CodeTypes.IRCODE,
+        wait=False,
     ),
     ucapi.media_player.Commands.FUNCTION_GREEN: CodeDefinition(
-        code="Action_B", type=CodeTypes.IRCODE
+        code="Action_B",
+        type=CodeTypes.IRCODE,
+        wait=False,
     ),
     ucapi.media_player.Commands.FUNCTION_RED: CodeDefinition(
-        code="Action_A", type=CodeTypes.IRCODE
+        code="Action_A",
+        type=CodeTypes.IRCODE,
+        wait=False,
     ),
     ucapi.media_player.Commands.FUNCTION_YELLOW: CodeDefinition(
-        code="Action_C", type=CodeTypes.IRCODE
+        code="Action_C",
+        type=CodeTypes.IRCODE,
+        wait=False,
+    ),
+    ucapi.media_player.Commands.GUIDE: CodeDefinition(
+        code="Guide",
+        type=CodeTypes.IRCODE,
+        wait=False,
     ),
     ucapi.media_player.Commands.HOME: CodeDefinition(
-        code="TIVO", type=CodeTypes.TELEPORT
+        code="TIVO",
+        type=CodeTypes.TELEPORT,
+        wait=False,
     ),
-    ucapi.media_player.Commands.MENU: CodeDefinition(
-        code="NOWPLAYING", type=CodeTypes.TELEPORT
+    ucapi.media_player.Commands.INFO: CodeDefinition(
+        code="Info",
+        type=CodeTypes.IRCODE,
+        wait=False,
+    ),
+    ucapi.media_player.Commands.LIVE: CodeDefinition(
+        code="LIVETV",
+        type=CodeTypes.TELEPORT,
+        wait=False,
+    ),
+    ucapi.media_player.Commands.MY_RECORDINGS: CodeDefinition(
+        code="NOWPLAYING",
+        type=CodeTypes.TELEPORT,
+        wait=False,
     ),
     ucapi.media_player.Commands.OFF: CodeDefinition(
         code="Standby",
@@ -105,6 +168,7 @@ AVAILABLE_COMMANDS: dict[str, CodeDefinition] = {
         type=CodeTypes.IRCODE,
         repeat=2,
         wait=False,
+        wait_repeat=0.3,
     ),
     ucapi.media_player.Commands.ON: CodeDefinition(
         code="Standby",
@@ -113,15 +177,29 @@ AVAILABLE_COMMANDS: dict[str, CodeDefinition] = {
         wait=False,
     ),
     ucapi.media_player.Commands.PLAY_PAUSE: CodeDefinition(
-        code="Pause", type=CodeTypes.IRCODE
+        code="Pause",
+        type=CodeTypes.IRCODE,
+        wait=False,
     ),
     ucapi.media_player.Commands.PREVIOUS: CodeDefinition(
-        code="Enter", type=CodeTypes.IRCODE
+        code="Enter",
+        type=CodeTypes.IRCODE,
+        wait=False,
+    ),
+    ucapi.media_player.Commands.RECORD: CodeDefinition(
+        code="record",
+        type=CodeTypes.IRCODE,
+        wait=False,
     ),
     ucapi.media_player.Commands.REWIND: CodeDefinition(
-        code="Reverse", type=CodeTypes.IRCODE
+        code="Reverse",
+        type=CodeTypes.IRCODE,
+        wait=False,
     ),
     ucapi.media_player.Commands.STOP: CodeDefinition(
-        code="Stop", state=ucapi.media_player.States.PLAYING, type=CodeTypes.IRCODE
+        code="Stop",
+        state=ucapi.media_player.States.PLAYING,
+        type=CodeTypes.IRCODE,
+        wait=False,
     ),
 }

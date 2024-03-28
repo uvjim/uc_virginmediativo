@@ -39,11 +39,15 @@ class TivoMediaPlayer:
                 ucapi.media_player.Features.COLOR_BUTTONS,
                 ucapi.media_player.Features.DPAD,
                 ucapi.media_player.Features.FAST_FORWARD,
+                ucapi.media_player.Features.GUIDE,
                 ucapi.media_player.Features.HOME,
+                ucapi.media_player.Features.INFO,
                 ucapi.media_player.Features.MENU,
+                ucapi.media_player.Features.NUMPAD,
                 ucapi.media_player.Features.ON_OFF,
                 ucapi.media_player.Features.PLAY_PAUSE,
                 ucapi.media_player.Features.PREVIOUS,
+                ucapi.media_player.Features.RECORD,
                 ucapi.media_player.Features.REWIND,
                 ucapi.media_player.Features.STOP,
             ],
@@ -56,6 +60,13 @@ class TivoMediaPlayer:
             },
             ucapi.media_player.DeviceClasses.SET_TOP_BOX,
             cmd_handler=self.async_cmd_handler,
+            options={
+                ucapi.media_player.Options.SIMPLE_COMMANDS: [
+                    simple_command
+                    for simple_command in const.AVAILABLE_COMMANDS.keys()
+                    if not isinstance(simple_command, ucapi.media_player.Commands)
+                ]
+            },
         )
 
     async def async_cmd_handler(
@@ -79,14 +90,40 @@ class TivoMediaPlayer:
             async with self._client:
                 code_def: const.CodeDefinition | None
                 if (code_def := const.AVAILABLE_COMMANDS.get(cmd_id, None)) is not None:
-                    if code_def.type == const.CodeTypes.IRCODE:
-                        for _ in range(1, code_def.repeat + 1):
+                    if (
+                        cmd_id == ucapi.media_player.Commands.PLAY_PAUSE
+                        and self.ucapi_entity.attributes.get(
+                            ucapi.media_player.Attributes.STATE
+                        )
+                        == ucapi.media_player.States.PAUSED
+                    ):
+                        await self._client.send_ircode("play", wait_for_reply=False)
+                    elif code_def.type == const.CodeTypes.IRCODE:
+                        for idx_repeat in range(1, code_def.repeat + 1):
                             await self._client.send_ircode(
                                 code_def.code, wait_for_reply=code_def.wait
                             )
+                            if (
+                                idx_repeat != code_def.repeat
+                                and code_def.wait_repeat is not None
+                            ):
+                                _LOG.debug(
+                                    "async_cmd_handler: sleeping (%s)s",
+                                    code_def.wait_repeat,
+                                )
+                                await asyncio.sleep(code_def.wait_repeat)
                     if code_def.type == const.CodeTypes.TELEPORT:
-                        for _ in range(1, code_def.repeat + 1):
+                        for idx_repeat in range(1, code_def.repeat + 1):
                             await self._client.send_teleport(code_def.code)
+                            if (
+                                idx_repeat != code_def.repeat
+                                and code_def.wait_repeat is not None
+                            ):
+                                _LOG.debug(
+                                    "async_cmd_handler: sleeping (%s)s",
+                                    code_def.wait_repeat,
+                                )
+                                await asyncio.sleep(code_def.wait_repeat)
 
                     # region #-- update state of the media player --#
                     _state: ucapi.media_player.States | None = code_def.state
@@ -124,19 +161,19 @@ class TivoMediaPlayer:
         """Query for current state."""
         _LOG.debug("async_query_state: entered (%s)", self._client.device.host)
         try:
+            _state: ucapi.media_player.States = ucapi.media_player.States.UNKNOWN
             async with self._client:
                 await self._client.wait_for_data()
             if self._client.device.channel_number is not None:
-                self._events.emit(
-                    Events.STATE_CHANGED,
-                    self.ucapi_entity.id,
-                    {
-                        ucapi.media_player.Attributes.STATE: ucapi.media_player.States.PLAYING
-                    },
-                )
-
+                _state = ucapi.media_player.States.PLAYING
         except VirginMediaError as exc:
             _LOG.error("async_query_state: %s", exc)
+
+        self._events.emit(
+            Events.STATE_CHANGED,
+            self.ucapi_entity.id,
+            {ucapi.media_player.Attributes.STATE: _state},
+        )
 
         _LOG.debug("async_query_state: exited (%s)", self._client.device.host)
 
