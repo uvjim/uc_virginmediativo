@@ -37,12 +37,6 @@ def _add_configured_device(device: config.VmTivoDevice) -> None:
         async_on_media_player_attributes_changed,
     )
 
-    for btn in const.AVAILABLE_COMMANDS.keys():
-        if not isinstance(btn, ucapi.media_player.Commands):
-            _make_available.append(
-                button.TivoButton(const.AVAILABLE_COMMANDS.get(btn), device, _client)
-            )
-
     _configured_tivos[device.id] = _make_available
 
     for entity in _configured_tivos[device.id]:
@@ -84,6 +78,7 @@ async def async_on_connect():
             if isinstance(tivo, media_player.TivoMediaPlayer):
                 await tivo.async_query_state()
 
+    await api.set_device_state(ucapi.DeviceStates.CONNECTED)
     _LOG.debug("async_on_connect: exited")
 
 
@@ -91,6 +86,8 @@ async def async_on_connect():
 async def async_on_disconnect():
     """Process remote disconnect."""
     _LOG.debug("async_on_disconnect: entered")
+
+    await api.set_device_state(ucapi.DeviceStates.DISCONNECTED)
     _LOG.debug("async_on_disconnect: exited")
 
 
