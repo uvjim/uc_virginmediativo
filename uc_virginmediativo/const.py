@@ -2,7 +2,15 @@
 
 from dataclasses import dataclass
 from enum import StrEnum
+from typing import Callable
+
 import ucapi
+
+
+class PollerType(StrEnum):
+    """"""
+
+    STATUS = "status"
 
 
 class CodeTypes(StrEnum):
@@ -37,6 +45,16 @@ class CodeDefinition:
 AVAILABLE_COMMANDS: dict[str, CodeDefinition] = {
     "CLEAR": CodeDefinition(
         code="clear",
+        type=CodeTypes.IRCODE,
+        wait=False,
+    ),
+    "PAUSE": CodeDefinition(
+        code="pause",
+        type=CodeTypes.IRCODE,
+        wait=False,
+    ),
+    "PLAY": CodeDefinition(
+        code="play",
         type=CodeTypes.IRCODE,
         wait=False,
     ),
@@ -164,7 +182,7 @@ AVAILABLE_COMMANDS: dict[str, CodeDefinition] = {
     ),
     ucapi.media_player.Commands.OFF: CodeDefinition(
         code="Standby",
-        state=ucapi.media_player.States.OFF,
+        state="OFF",
         type=CodeTypes.IRCODE,
         repeat=2,
         wait=False,
@@ -172,7 +190,7 @@ AVAILABLE_COMMANDS: dict[str, CodeDefinition] = {
     ),
     ucapi.media_player.Commands.ON: CodeDefinition(
         code="Standby",
-        state=ucapi.media_player.States.ON,
+        state="ON",
         type=CodeTypes.IRCODE,
         wait=False,
     ),
@@ -198,8 +216,9 @@ AVAILABLE_COMMANDS: dict[str, CodeDefinition] = {
     ),
     ucapi.media_player.Commands.STOP: CodeDefinition(
         code="Stop",
-        state=ucapi.media_player.States.PLAYING,
         type=CodeTypes.IRCODE,
         wait=False,
     ),
 }
+
+POLLER_FUNCS: dict[PollerType, Callable] = {}

@@ -6,7 +6,10 @@ import logging
 import os
 from typing import Callable, Iterator
 
+from logger import log, log_formatter
+
 _LOG = logging.getLogger(__name__)
+_LOG_INC_DATETIME: bool = True
 
 
 @dataclasses.dataclass
@@ -33,9 +36,15 @@ AddCallback = Callable[[VmTivoDevice], None]
 RemoveCallback = Callable[[VmTivoDevice | None], None]
 
 
+def device_id_from_entity_id(entity_id: str) -> str | None:
+    """"""
+    return entity_id.split(".")[1]
+
+
 class Devices:
     """Manage all configured devices."""
 
+    @log(_LOG, include_datetime=_LOG_INC_DATETIME)
     def __init__(
         self,
         config_dir: str,
@@ -44,7 +53,6 @@ class Devices:
     ) -> None:
         """Initialise."""
 
-        _LOG.debug("initialising config")
         self._callback_add: AddCallback | None = add_callback
         self._callback_remove: RemoveCallback | None = remove_callback
         self._config_dir: str = config_dir
@@ -52,6 +60,7 @@ class Devices:
         self._config: list[VmTivoDevice] = []
         self.load()
 
+    @log(_LOG, include_datetime=_LOG_INC_DATETIME)
     def add(self, tivo: VmTivoDevice) -> None:
         """Add a new device as configured."""
         if not self.contains(tivo.address):
@@ -65,6 +74,7 @@ class Devices:
         """Allow iterating over configured devices."""
         return iter(self._config)
 
+    @log(_LOG, include_datetime=_LOG_INC_DATETIME)
     def clear(self) -> None:
         """Clear all configured devices."""
         self._config = []
@@ -89,13 +99,19 @@ class Devices:
 
         return None
 
+    @log(_LOG, include_datetime=_LOG_INC_DATETIME)
     def load(self) -> bool:
         """Load the configured devices from disk."""
         ret = False
 
         try:
             if not os.path.exists(self._config_path):
-                _LOG.debug("no configuration file found")
+                _LOG.debug(
+                    log_formatter(
+                        "no configuration file found",
+                        include_datetime=_LOG_INC_DATETIME,
+                    )
+                )
             else:
                 with open(self._config_path, "r", encoding="utf-8") as f:
                     data = json.load(f)
@@ -109,6 +125,7 @@ class Devices:
 
         return ret
 
+    @log(_LOG, include_datetime=_LOG_INC_DATETIME)
     def remove(self, tivo_id: str) -> bool:
         """Remove a device from the configuration."""
         tivo_device: VmTivoDevice | None
@@ -125,6 +142,7 @@ class Devices:
 
         return ret
 
+    @log(_LOG, include_datetime=_LOG_INC_DATETIME)
     def save(self) -> bool:
         """Save configured devices to disk."""
         ret: bool = False

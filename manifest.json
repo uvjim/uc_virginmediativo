@@ -1,6 +1,6 @@
 {
 	"driver_id": "uvjim_virginmediatv_dev_driver",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"min_core_api": "0.20.0",
 	"name": {
 		"en": "Virgin Media TiVo (NEW DEV)"
@@ -35,5 +35,5 @@
 			}
 		]
 	},
-	"release_date": "2023-12-15"
+	"release_date": "2024-07-06"
 }

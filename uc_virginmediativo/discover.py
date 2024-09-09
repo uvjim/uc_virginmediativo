@@ -3,12 +3,15 @@
 import asyncio
 import logging
 
+from logger import log, log_formatter
 from zeroconf import ServiceStateChange, Zeroconf
 from zeroconf.asyncio import AsyncServiceBrowser, AsyncServiceInfo, AsyncZeroconf
 
-_LOG = logging.getLogger(__name__)
+_LOG: asyncio.AbstractEventLoop = logging.getLogger(__name__)
+_LOG_INC_DATETIME: bool = True
 
 
+@log(_LOG, include_datetime=_LOG_INC_DATETIME)
 async def devices(timeout: int = 10) -> list[dict[str, str]]:
     """Discover devices."""
     discovered_devices: list[dict[str, str]] = []
@@ -22,7 +25,12 @@ async def devices(timeout: int = 10) -> list[dict[str, str]]:
         if state_change is not ServiceStateChange.Added:
             return
 
-        _LOG.info("found service: %s, %s", service_type, name)
+        _LOG.info(
+            log_formatter(
+                f"found service: {service_type}, {name}",
+                include_datetime=_LOG_INC_DATETIME,
+            )
+        )
         _ = asyncio.ensure_future(display_service_info(zeroconf, service_type, name))
 
     async def display_service_info(
@@ -40,13 +48,19 @@ async def devices(timeout: int = 10) -> list[dict[str, str]]:
                     "port": info.port,
                     "serial": info.properties.get(b"TSN").decode("utf-8"),
                 }
-                _LOG.debug("found: %s", discovered_device)
+                _LOG.debug(
+                    log_formatter(
+                        f"found: {discovered_device}",
+                        include_datetime=_LOG_INC_DATETIME,
+                    )
+                )
                 discovered_devices.append(discovered_device)
         else:
-            _LOG.debug("no info for %s", name)
+            _LOG.debug(
+                log_formatter(f"no info for {name}", include_datetime=_LOG_INC_DATETIME)
+            )
 
     try:
-        _LOG.debug("discovering devices")
         aiozc = AsyncZeroconf()
         services = ["_tivo-remote._tcp.local."]
 
@@ -57,8 +71,11 @@ async def devices(timeout: int = 10) -> list[dict[str, str]]:
         await asyncio.sleep(timeout)
         await aiobrowser.async_cancel()
         await aiozc.async_close()
-        _LOG.debug("discovery finished")
     except OSError as err:
-        _LOG.error("failed starting discovery: %s", err)
+        _LOG.error(
+            log_formatter(
+                f"failed starting discovery: {err}", include_datetime=_LOG_INC_DATETIME
+            )
+        )
 
     return discovered_devices

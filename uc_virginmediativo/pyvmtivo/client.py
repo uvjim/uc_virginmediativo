@@ -295,7 +295,7 @@ class Client:
                 )
             except Exception as err:
                 if isinstance(err, asyncio.TimeoutError):
-                    self._tivo.channel_number = None
+                    # self._tivo.channel_number = None
                     raise VirginMediaCommandTimeout from err
 
                 _LOGGER.warning(
@@ -308,7 +308,7 @@ class Client:
             _LOGGER.debug(self._log_formatter.format("raw data: %s"), data)
 
             if not data:
-                self._tivo.channel_number = None
+                # self._tivo.channel_number = None
                 raise VirginMediaConnectionReset from None
 
             data = data.decode().strip()

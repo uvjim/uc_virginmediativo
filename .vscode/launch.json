@@ -6,7 +6,7 @@
     "configurations": [
         {
             "name": "Python: Driver",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "uc_virginmediativo\\driver.py",
             "console": "integratedTerminal",
