@@ -1,0 +1,39 @@
+{
+    "driver_id": "uvjim_virginmediativo",
+    "version": "2024.9.1",
+    "min_core_api": "0.20.0",
+    "name": {
+        "en": "Virgin Media TiVo"
+    },
+    "icon": "custom:virgin_media.png",
+    "description": {
+        "en": "Control the Virgin Media v6 TiVo STB."
+    },
+    "developer": {
+        "name": "uvjim",
+        "email": "git@uvjim.co.uk",
+        "url": "https://github.com/uvjim"
+    },
+    "home_page": "https://github.com/uvjim/uc_virginmediativo",
+    "release_date": "2024-09-09",
+    "setup_data_schema": {
+        "title": {
+            "en": "Integration setup"
+        },
+        "settings": [
+            {
+                "id": "info",
+                "label": {
+                    "en": "Setup process"
+                },
+                "field": {
+                    "label": {
+                        "value": {
+                            "en": "The integration will discover your Virgin Media TiVo devices on your network. Only those devices that run the original TiVo software are supported."
+                        }
+                    }
+                }
+            }
+        ]
+    }
+}

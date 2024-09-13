@@ -1,20 +1,15 @@
 # VSCode
 .vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
+#!.vscode/settings.json
+#!.vscode/tasks.json
+#!.vscode/launch.json
+#!.vscode/extensions.json
 *.code-workspace
 # Local History for Visual Studio Code
 .history/
 
-# Private Files
-*.json
-*.csv
-*.csv.gz
-*.tsv
-*.tsv.gz
-*.xlsx
+# Private files
+config.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
