@@ -4,6 +4,10 @@ name: "Build & Release"
 on:
   workflow_dispatch:
 
+# adjust token permissions
+permissions:
+  contents: write
+
 # environment variables
 env:
   HASH_FILENAME: uc-intg-virginmediativo.hash
@@ -12,6 +16,7 @@ env:
 
 jobs:
   build:
+    name: "Build"
     runs-on: ubuntu-latest
     steps:
       - name: "Checkout"
