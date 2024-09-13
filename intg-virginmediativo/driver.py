@@ -216,7 +216,7 @@ async def async_main():
 
     setup: SetupFlow = SetupFlow()
     await api.init(
-        "manifest.json",
+        "driver.json",
         setup.async_setup_handler,
     )
 
