@@ -6,6 +6,7 @@ on:
 
 # environment variables
 env:
+  HASH_FILENAME: uc-intg-virginmediativo.hash
   INTG_NAME: "virginmediativo"
   PYTHON_VER: 3.11.6-0.2.0
 
