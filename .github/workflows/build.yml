@@ -51,7 +51,7 @@ jobs:
             bash -c \
             "cd /workspace && \
               python -m pip install -r requirements.txt && \
-              pyinstaller --clean --onedir --hidden-import 'zeroconf._utils.ipaddress' --hidden-import 'zeroconf._handlers.answers' --name driver intg-virginmediativo/driver.py"
+              pyinstaller --clean --onedir --hidden-import=zeroconf --name driver intg-virginmediativo/driver.py"
       
       - name: Add version
         run: |
