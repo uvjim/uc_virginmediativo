@@ -3,6 +3,7 @@
 import asyncio
 import logging
 
+import zeroconf
 from logger import log, log_formatter
 from zeroconf import ServiceStateChange, Zeroconf
 from zeroconf.asyncio import AsyncServiceBrowser, AsyncServiceInfo, AsyncZeroconf
