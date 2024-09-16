@@ -1,6 +1,6 @@
 {
     "driver_id": "uvjim_virginmediativo",
-    "version": "2024.9.1",
+    "version": "2024.9.2",
     "min_core_api": "0.20.0",
     "name": {
         "en": "Virgin Media TiVo"
