@@ -390,7 +390,7 @@ class TivoRemote(Remote):
 
         repeat: int = params.get("repeat", 1)
         ret: StatusCodes = StatusCodes.OK
-        for r in range(0, repeat):
+        for _ in range(0, repeat):
             ret = await self.async_handle_command(cmd_id, params)
 
         return ret
@@ -401,9 +401,6 @@ class TivoRemote(Remote):
     ) -> StatusCodes:
         """"""
 
-        _LOG.debug(
-            log_formatter(f"----->{cmd_id}<-----", include_datetime=_LOG_INC_DATETIME)
-        )
         _LOG.debug(
             log_formatter(
                 f"on entry remote is: {self._remote_state.value}",
@@ -436,32 +433,34 @@ class TivoRemote(Remote):
         code_def: CodeDefinition | None
         err: bool = False
         try:
-            if (code_def := AVAILABLE_COMMANDS.get(command, None)) is not None:
-                if command == MediaPlayerCommands.PLAY_PAUSE:
-                    if self._remote_state != RemoteState.LIVE:
-                        _LOG.debug(
-                            log_formatter(
-                                "switching command to PLAY",
-                                include_datetime=_LOG_INC_DATETIME,
-                            )
+            if (code_def := AVAILABLE_COMMANDS.get(command, None)) is None:
+                return StatusCodes.NOT_IMPLEMENTED
+
+            if command == MediaPlayerCommands.PLAY_PAUSE:
+                if self._remote_state != RemoteState.LIVE:
+                    _LOG.debug(
+                        log_formatter(
+                            "switching command to PLAY",
+                            include_datetime=_LOG_INC_DATETIME,
                         )
-                        command = "PLAY"
-                        code_def = AVAILABLE_COMMANDS.get(command, None)
+                    )
+                    command = "PLAY"
+                    code_def = AVAILABLE_COMMANDS.get(command, None)
 
-                if code_def.type == CodeTypes.IRCODE:
-                    args = [
-                        code_def.code,
-                        (
-                            code_def.wait
-                            if self._remote_state is RemoteState.LIVE
-                            else False
-                        ),
-                    ]
-                    func = self._client.send_ircode
+            if code_def.type == CodeTypes.IRCODE:
+                args = [
+                    code_def.code,
+                    (
+                        code_def.wait
+                        if self._remote_state is RemoteState.LIVE
+                        else False
+                    ),
+                ]
+                func = self._client.send_ircode
 
-                if code_def.type == CodeTypes.TELEPORT:
-                    args = [code_def.code]
-                    func = self._client.send_teleport
+            if code_def.type == CodeTypes.TELEPORT:
+                args = [code_def.code]
+                func = self._client.send_teleport
 
             async with self._client:
                 for idx_repeat in range(1, code_def.repeat + 1):
