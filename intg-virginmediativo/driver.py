@@ -71,7 +71,7 @@ async def async_on_remote_disconnect():
 @api.listens_to(ucapi.Events.SUBSCRIBE_ENTITIES)
 @log(_LOG, include_datetime=_LOG_INC_DATETIME)
 async def async_on_subscribe_entities(entity_ids: list[str]) -> None:
-    """"""
+    """Process entities being subscribed to."""
     for entity_id in entity_ids:
         device_id: str | None
         if (device_id := config.device_id_from_entity_id(entity_id)) is not None:
@@ -104,14 +104,14 @@ async def async_on_unsubscribe_entities(entity_ids: list[str]) -> None:
 @api.listens_to(ucapi.Events.ENTER_STANDBY)
 @log(_LOG, include_datetime=_LOG_INC_DATETIME)
 async def async_on_remote_enter_standby() -> None:
-    """"""
+    """Handle the remote entering standby."""
     await async_stop_poller(PollerType.STATUS)
 
 
 @api.listens_to(ucapi.Events.EXIT_STANDBY)
 @log(_LOG, include_datetime=_LOG_INC_DATETIME)
 async def async_on_remote_exit_standby() -> None:
-    """"""
+    """Handle the remote exiting standby."""
     await async_start_poller(PollerType.STATUS)
 
 
@@ -144,7 +144,7 @@ def on_device_removed(device_config: config.VmTivoDevice) -> None:
 async def async_on_remote_attributes_changed(
     entity_id: str, attributes: dict[str, Any]
 ):
-    """"""
+    """React to attributes changing."""
 
     entity: ucapi.Entity | None = None
     if (entity := api.configured_entities.get(entity_id)) is not None:
@@ -154,7 +154,7 @@ async def async_on_remote_attributes_changed(
 @log(_LOG, include_datetime=_LOG_INC_DATETIME)
 @attaches_to(PollerType.STATUS)
 async def async_status_poller(interval: float) -> None:
-    """"""
+    """Poll the TiVo to establish status."""
 
     try:
         while True:
@@ -178,7 +178,7 @@ async def async_status_poller(interval: float) -> None:
 
 @log(_LOG, include_datetime=_LOG_INC_DATETIME)
 async def async_start_poller(task_type: PollerType, interval: float = 10.0) -> None:
-    """"""
+    """Start the polling process."""
 
     if task_type not in _BACKGROUND_POLLERS and task_type in POLLER_FUNCS:
         polling_task: asyncio.Task = asyncio.create_task(
@@ -189,7 +189,7 @@ async def async_start_poller(task_type: PollerType, interval: float = 10.0) -> N
 
 @log(_LOG, include_datetime=_LOG_INC_DATETIME)
 async def async_stop_poller(task_type: PollerType) -> None:
-    """"""
+    """Stop the polling process."""
 
     if (task := _BACKGROUND_POLLERS.get(task_type)) is not None:
         task.cancel("remote went into standby")

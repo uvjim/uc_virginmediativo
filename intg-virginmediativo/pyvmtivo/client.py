@@ -2,9 +2,10 @@
 
 # region #-- imports --#
 import asyncio
+import contextlib
 import logging
 import re
-from typing import Callable, List
+from typing import Callable
 
 from .const import (
     DEFAULT_COMMAND_TIMEOUT,
@@ -79,7 +80,7 @@ class Client:
     ) -> None:
         """Initialise."""
         self._command_timeout: float | None = command_timeout or DEFAULT_COMMAND_TIMEOUT
-        self._data_callback: List = []
+        self._data_callback: list = []
         self._host: str = host
         self._lock_read: asyncio.Lock = asyncio.Lock()
         self._log_formatter: Logger = Logger()
@@ -341,10 +342,8 @@ class Client:
     def remove_data_callback(self, callback: Callable) -> None:
         """Remove the given callback from being processed."""
         _LOGGER.debug(self._log_formatter.format("entered"))
-        try:
+        with contextlib.suppress(ValueError):
             self._data_callback.remove(callback)
-        except ValueError:
-            pass
         _LOGGER.debug(self._log_formatter.format("exited"))
 
     # endregion

@@ -1,4 +1,4 @@
-""""""
+"""Constants."""
 
 from dataclasses import dataclass
 from enum import StrEnum
@@ -8,7 +8,7 @@ import ucapi
 
 
 class PollerType(StrEnum):
-    """"""
+    """Available pollers."""
 
     STATUS = "status"
 
