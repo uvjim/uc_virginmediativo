@@ -7,7 +7,6 @@ import config
 import discover
 from logger import log, log_formatter
 from pyvmtivo.client import DEFAULT_CONNECT_PORT, Client
-from pyvmtivo.exceptions import VirginMediaError
 from ucapi import (
     AbortDriverSetup,
     DriverSetupRequest,
@@ -29,14 +28,14 @@ class SetupFlow:
 
     @log(_LOG, include_datetime=_LOG_INC_DATETIME)
     def __init__(self):
-        """Initialise"""
+        """Initialise."""
         self._discovered_devices: list[dict[str, str]] = []
         self._first_step: str = "init"
         self._step_id: str
         self.rewind()
 
     def rewind(self) -> None:
-        """Reset the current step to the first one"""
+        """Reset the current step to the first one."""
         self._step_id = self._first_step
 
     @log(_LOG, include_datetime=_LOG_INC_DATETIME)
@@ -90,7 +89,7 @@ class SetupFlow:
     async def async_step_init(
         self, msg: DriverSetupRequest
     ) -> RequestUserInput | SetupError:
-        """Init step"""
+        """Init step."""
 
         return RequestUserInput(
             {
@@ -128,7 +127,7 @@ class SetupFlow:
     async def async_step_discovery(
         self, msg: DriverSetupRequest
     ) -> RequestUserInput | SetupError:
-        """Discovery step"""
+        """Discovery step."""
 
         self._discovered_devices = await discover.devices()
 

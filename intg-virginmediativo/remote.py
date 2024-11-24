@@ -5,7 +5,6 @@ import asyncio
 import logging
 import math
 from enum import StrEnum
-from sre_parse import State
 from typing import Any
 
 from config import VmTivoDevice
@@ -41,7 +40,7 @@ class Events(StrEnum):
 
 
 class RemoteState(StrEnum):
-    """What is the remote doing?"""
+    """Possible remote states."""
 
     DVR = "dvr"
     LIVE = "live"
@@ -143,7 +142,7 @@ class TivoRemote(Remote):
         features: list[Features] = [Features.ON_OFF, Features.SEND_CMD]
         simple_commands: list[str] = [
             simple_command
-            for simple_command in AVAILABLE_COMMANDS.keys()
+            for simple_command in AVAILABLE_COMMANDS
             if not isinstance(simple_command, MediaPlayerCommands)
         ]
 
@@ -371,7 +370,7 @@ class TivoRemote(Remote):
         self,
         device: Device,
     ) -> None:
-        """"""
+        """Process data received from the TiVo."""
         cur_state: States = States.UNKNOWN
         if device.channel_number is not None:
             cur_state = States.ON
@@ -386,7 +385,7 @@ class TivoRemote(Remote):
     async def command(
         self, cmd_id: str, params: dict[str, Any] | None = None
     ) -> StatusCodes:
-        """"""
+        """Process commands received from the remote."""
 
         repeat: int = params.get("repeat", 1)
         ret: StatusCodes = StatusCodes.OK
@@ -399,7 +398,7 @@ class TivoRemote(Remote):
     async def async_handle_command(
         self, cmd_id: str, params: dict[str, Any] | None = None
     ) -> StatusCodes:
-        """"""
+        """Process the actual commands received from the remote."""
 
         _LOG.debug(
             log_formatter(
@@ -417,7 +416,7 @@ class TivoRemote(Remote):
         elif cmd_id == Commands.SEND_CMD:
             if params is not None:
                 command = params.get("command")
-                if command not in AVAILABLE_COMMANDS.keys():
+                if command not in AVAILABLE_COMMANDS:
                     return StatusCodes.NOT_IMPLEMENTED
         elif cmd_id == Commands.SEND_CMD_SEQUENCE:
             cmd_sequence: list[MediaPlayerCommands | str] = params.get("sequence", [])
@@ -522,7 +521,7 @@ class TivoRemote(Remote):
         return StatusCodes.OK
 
     async def get_state(self, connect: bool = True) -> States:
-        """Determine the current state of the TiVo"""
+        """Determine the current state of the TiVo."""
         ret = States.OFF
         try:
             if connect:

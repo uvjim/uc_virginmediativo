@@ -1,3 +1,5 @@
+"""Logging."""
+
 import datetime
 import inspect
 from functools import wraps
@@ -8,7 +10,7 @@ from typing import Any, Callable
 def log_formatter(
     msg, include_datetime: bool = True, func: Callable | None = None
 ) -> str:
-    """"""
+    """Format the logs for display."""
     ret: str = ""
     if include_datetime:
         ret += f"[{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] "
@@ -24,6 +26,8 @@ def log_formatter(
 
 
 def log(logger: Logger, include_datetime: bool = True, include_func_name: bool = True):
+    """Wrap function for logging."""
+
     def decorator(func):
         def start_log(*args, **kwargs):
             repr_args: list[Any] = [repr(a) for a in args]

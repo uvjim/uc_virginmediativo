@@ -4,7 +4,8 @@ import dataclasses
 import json
 import logging
 import os
-from typing import Callable, Iterator
+from collections.abc import Iterator
+from typing import Callable
 
 from logger import log, log_formatter
 
@@ -37,7 +38,7 @@ RemoveCallback = Callable[[VmTivoDevice | None], None]
 
 
 def device_id_from_entity_id(entity_id: str) -> str | None:
-    """"""
+    """Retrieve the device id from the entity id."""
     return entity_id.split(".")[1]
 
 
@@ -113,7 +114,7 @@ class Devices:
                     )
                 )
             else:
-                with open(self._config_path, "r", encoding="utf-8") as f:
+                with open(self._config_path, encoding="utf-8") as f:
                     data = json.load(f)
                 for itm in data:
                     self._config.append(VmTivoDevice(**itm))

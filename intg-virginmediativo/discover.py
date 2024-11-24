@@ -3,7 +3,6 @@
 import asyncio
 import logging
 
-import zeroconf
 from logger import log, log_formatter
 from zeroconf import ServiceStateChange, Zeroconf
 from zeroconf.asyncio import AsyncServiceBrowser, AsyncServiceInfo, AsyncZeroconf
@@ -32,7 +31,9 @@ async def devices(timeout: int = 10) -> list[dict[str, str]]:
                 include_datetime=_LOG_INC_DATETIME,
             )
         )
-        _ = asyncio.ensure_future(display_service_info(zeroconf, service_type, name))
+        task_service_info: asyncio.Task = asyncio.ensure_future(  # noqa: F841,RUF006
+            display_service_info(zeroconf, service_type, name)
+        )
 
     async def display_service_info(
         zeroconf: Zeroconf, service_type: str, name: str
